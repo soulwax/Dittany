@@ -1,10 +1,12 @@
 package de.cirrus.dittany;
 
+import java.util.*;
+
 import de.cirrus.dittany.level.Level;
 import de.cirrus.dittany.unit.*;
 
 public class Player {
-	public int selected = 0;
+	public List<Mob> selection = new ArrayList<Mob>();
 	public Team team;
 	public int[] visMap;
 	public Level level;
@@ -17,6 +19,10 @@ public class Player {
 	}
 
 	public void tick() {
+		for (int i = 0; i < selection.size(); i++) {
+			if (selection.get(i).removed) selection.remove(i--);
+		}
+
 		for (int i = 0; i < visMap.length; i++) {
 			visMap[i] &= 1;
 		}
@@ -82,8 +88,21 @@ public class Player {
 		return false;
 	}
 
+	public void select(Mob unit) {
+		selection.clear();
+		if (unit != null) selection.add(unit);
+	}
+
+	public boolean isSelected(int unitClass) {
+		for (Mob m : selection) {
+			if (m.unitClass == unitClass) return true;
+		}
+		return false;
+	}
+
 	public Mob getSelectedUnit() {
-		return getUnit(selected);
+		if (selection.isEmpty()) return null;
+		return selection.get(0);
 	}
 
 	public Mob getUnit(int unitClass) {

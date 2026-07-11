@@ -12,6 +12,9 @@ public class PlayerView {
 	public boolean dragging;
 	public int xStartDrag, yStartDrag;
 
+	public boolean selecting;
+	public int xSelectStart, ySelectStart;
+
 	public double xScroll = 442;
 	public double yScroll = 286;
 	public double xScrollA = 0;
@@ -37,8 +40,7 @@ public class PlayerView {
 		double xt = xx + yy;
 		double yt = yy - xx;
 
-		Mob unit = player.getSelectedUnit();
-		if (unit != null) {
+		for (Mob unit : player.selection) {
 			unit.setOrder(new MoveOrder(xt, yt));
 		}
 	}
@@ -78,22 +80,39 @@ public class PlayerView {
 		if (input.unit8.typed) toSelect = 7;
 		if (input.unit9.typed) toSelect = 8;
 		if (toSelect >= 0) {
-			if (toSelect == player.selected) {
-				centerOn(player.getSelectedUnit());
+			Mob unit = player.getUnit(toSelect);
+			if (unit != null && player.selection.size() == 1 && unit == player.getSelectedUnit()) {
+				centerOn(unit);
 			} else {
-				player.selected = toSelect;
+				player.select(unit);
 			}
 		}
 
-		if (input.nextUnit.typed) player.selected++;
-		if (input.prevUnit.typed) player.selected--;
-		if (player.selected >= 9) player.selected -= 9;
-		if (player.selected < 0) player.selected += 9;
+		if (input.nextUnit.typed || input.prevUnit.typed) {
+			Mob unit = player.getSelectedUnit();
+			int unitClass = unit == null ? 0 : unit.unitClass;
+			if (input.nextUnit.typed) unitClass++;
+			if (input.prevUnit.typed) unitClass--;
+			if (unitClass >= 9) unitClass -= 9;
+			if (unitClass < 0) unitClass += 9;
+			player.select(player.getUnit(unitClass));
+		}
 
 		if (input.b0Clicked) {
-			Mob nearest = getNearest(input.x, input.y);
-			if (nearest != null && nearest != player.getSelectedUnit()) {
-				player.selected = nearest.unitClass;
+			selecting = true;
+			xSelectStart = input.x;
+			ySelectStart = input.y;
+		}
+
+		if (input.b0Released && selecting) {
+			selecting = false;
+			int xd = input.x - xSelectStart;
+			int yd = input.y - ySelectStart;
+			if (xd * xd + yd * yd < 9) {
+				Mob nearest = getNearest(input.x, input.y);
+				if (nearest != null) player.select(nearest);
+			} else {
+				selectAll(xSelectStart, ySelectStart, input.x, input.y);
 			}
 		}
 
@@ -159,12 +178,12 @@ public class PlayerView {
 		}
 		int r = 8;
 
-		//		player.selected.clear();
+		player.selection.clear();
 		for (Unit u : game.level.getUnitScreenSpace(x0 - r, y0 - r, x1 + r, y1 + r)) {
 			if (u instanceof Mob) {
 				Mob m = (Mob) u;
 				if (m.team == player.team) {
-					player.selected = m.unitClass;
+					player.selection.add(m);
 				}
 			}
 		}
@@ -191,15 +210,18 @@ public class PlayerView {
 		screen.fill(0, 0, screen.w, screen.h, 0xffff00ff);
 		game.render(screen, (int) Math.floor(xScroll), (int) Math.floor(yScroll), player.visMap);
 
-		Mob u = player.getSelectedUnit();
-		if (u != null) u.renderSelected(screen);
+		for (Mob u : player.selection) {
+			u.renderSelected(screen);
+		}
 
 		screen.xOffs = 0;
 		screen.yOffs = 0;
 
+		if (selecting) drawSelectBox(screen, xSelectStart, ySelectStart, input.x, input.y);
+
 		screen.draw(minimap.img, 2, screen.h - 58);
 		for (int i = 0; i < 9; i++) {
-			if (player.selected == i) {
+			if (player.isSelected(i)) {
 				screen.draw(Art.i.red[i][14], i * 20 + 64, 240 - 16);
 				screen.draw(Art.i.cursors[1][0], i * 20 + 64, 240 - 16 - 10 - (int) (Math.abs(Math.sin(time / 10.0) * 6.5)));
 			} else {
