@@ -139,7 +139,7 @@ public class Dittany extends Canvas implements Runnable {
 	public static void main(String[] args) {
 		Dittany gameComponent = new Dittany();
 
-		JFrame frame = new JFrame("Herp Fortress");
+		JFrame frame = new JFrame("Dittany");
 		frame.add(gameComponent);
 		frame.pack();
 		frame.setResizable(false);
