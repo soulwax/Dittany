@@ -1,0 +1,11 @@
+{
+    // Build config comes from the Eclipse .classpath (src + res as source folders, output to bin)
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.debug.settings.onBuildFailureProceed": false,
+    "files.exclude": {
+        "bin/": true
+    },
+    "search.exclude": {
+        "bin/": true
+    }
+}

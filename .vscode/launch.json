@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Dittany",
+            "request": "launch",
+            "mainClass": "de.cirrus.dittany.Dittany",
+            "projectName": "Dittany"
+        }
+    ]
+}
