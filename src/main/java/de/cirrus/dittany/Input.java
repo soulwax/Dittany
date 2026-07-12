@@ -64,6 +64,7 @@ public class Input {
 	public Key unit9 = new Key(this).bind(KeyEvent.VK_9).bind(KeyEvent.VK_NUMPAD3).bind(KeyEvent.VK_N);
 	public Key nextUnit = new Key(this).bind(KeyEvent.VK_E).bind(KeyEvent.VK_TAB);
 	public Key prevUnit = new Key(this).bind(KeyEvent.VK_Q);
+	public Key escape = new Key(this).bind(KeyEvent.VK_ESCAPE);
 
 	public Input() {
 	}

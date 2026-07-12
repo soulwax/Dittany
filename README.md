@@ -23,6 +23,7 @@ This is a prototype rather than a complete commercial game. There are no menus, 
 | Select a class | `1`–`9`, numpad layout, or `R T Y / F G H / V B N` |
 | Cycle classes | `Q` and `E`/`Tab` |
 | Center on a unit | Select its class again |
+| Pause/open settings | `Esc` |
 
 Units engage enemies automatically when a target is within their weapon range.
 
@@ -54,7 +55,7 @@ Build a self-contained Windows application image with:
 .\gradlew.bat --no-daemon clean build packageExe
 ```
 
-The result is written to `build/jpackage/Dittany`. Distribute that entire directory, not only the executable. It contains `Dittany.exe`, the game JAR, resources, native support files, and a Java runtime, so players do not need Java installed.
+The result is written to `dist/Dittany`. Distribute that entire directory, not only the executable. It contains `Dittany.exe`, the game JAR, resources, native support files, and a Java runtime, so players do not need Java installed. Distributions live outside Gradle's temporary `build` directory, allowing `gradlew clean` to work while a packaged copy of the game is running.
 
 Packaging requires a full JDK 26 containing `jpackage`. WiX is not required because this task creates a portable application directory rather than an installer.
 
@@ -168,8 +169,10 @@ The `de.cirrus.dittany.gui` package supplies a deliberately small retained GUI m
 - `GuiContainer` owns child components and forwards ticks and rendering.
 - `GuiPanel` is a colored, optionally bordered container.
 - `GuiImage` draws a `Bitmap`.
+- `GuiLabel` rasterizes short AWT text into a `Bitmap`.
 - `GuiButton` exposes polled `hovered`, `down`, and `clicked` state.
 - `GuiProgressBar` draws a bounded value such as health or ammunition.
+- `SettingsMenu` composes these controls into the ESC pause menu.
 
 State is public and behavior is polled, like `Input`, `Sprite`, and the other original engine classes. Gameplay code therefore remains in its owner instead of being hidden inside GUI callbacks.
 

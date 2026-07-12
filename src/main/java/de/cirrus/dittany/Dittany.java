@@ -5,6 +5,7 @@ import java.awt.image.*;
 
 import javax.swing.JFrame;
 
+import de.cirrus.dittany.gui.SettingsMenu;
 import de.cirrus.dittany.level.EntityListCache;
 
 public class Dittany extends Canvas implements Runnable {
@@ -23,6 +24,8 @@ public class Dittany extends Canvas implements Runnable {
 	private Input mouse;
 	private Game game;
 	private PlayerView playerView;
+	private SettingsMenu settingsMenu;
+	private boolean paused;
 
 	public Dittany() {
 		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
@@ -52,6 +55,7 @@ public class Dittany extends Canvas implements Runnable {
 
 		game = new Game();
 		playerView = new PlayerView(game, game.level.redPlayer, mouse);
+		settingsMenu = new SettingsMenu(WIDTH, HEIGHT);
 		requestFocus();
 	}
 
@@ -128,10 +132,18 @@ public class Dittany extends Canvas implements Runnable {
 
 	private void render(Bitmap screen) {
 		playerView.render(screen);
+		if (paused) settingsMenu.render(screen);
 		if (mouse.onScreen) screen.draw(Art.i.cursors[0][0], mouse.x - 1, mouse.y - 1);
 	}
 
 	private void tick() {
+		if (mouse.escape.typed) paused = !paused;
+		if (paused) {
+			settingsMenu.tick(mouse);
+			if (settingsMenu.resume) paused = false;
+			if (settingsMenu.quit) stop();
+			return;
+		}
 		game.tick();
 		playerView.tick();
 	}

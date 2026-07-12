@@ -43,8 +43,9 @@ tasks.register<Exec>("packageExe") {
     dependsOn("installDist")
 
     val installDir = layout.buildDirectory.dir("install/${project.name}")
-    val outputDir = layout.buildDirectory.dir("jpackage")
-    val appImageDir = outputDir.map { it.dir(project.name) }
+    // Keep runnable distributions outside build/ so Gradle can clean while the game is open.
+    val outputDir = layout.projectDirectory.dir("dist")
+    val appImageDir = outputDir.dir(project.name)
     val jpackage = File(
         System.getProperty("java.home"),
         if (System.getProperty("os.name").startsWith("Windows")) "bin/jpackage.exe" else "bin/jpackage"
@@ -60,8 +61,8 @@ tasks.register<Exec>("packageExe") {
                     "Run Gradle with a full JDK 26."
             )
         }
-        outputDir.get().asFile.mkdirs()
-        appImageDir.get().asFile.deleteRecursively()
+        outputDir.asFile.mkdirs()
+        appImageDir.asFile.deleteRecursively()
     }
 
     executable(jpackage)
@@ -72,7 +73,7 @@ tasks.register<Exec>("packageExe") {
         "--input", installDir.map { it.dir("lib") }.get().asFile,
         "--main-jar", "${project.name}-${project.version}.jar",
         "--main-class", application.mainClass.get(),
-        "--dest", outputDir.get().asFile,
+        "--dest", outputDir.asFile,
         "--java-options", "-Dfile.encoding=UTF-8"
     )
 }
