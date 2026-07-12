@@ -1,14 +1,19 @@
-bin/
-.gradle
-build
+.gradle/
+build/
 *~
 .DS_Store
-/dist/
-.settings
+dist/
+.settings/
+.classpath
+.project
 *.class
 *.sw?
 lib/.tmp/
 doc/
 *.db
+
+# IDE-local metadata
+.idea/
+*.iml
 
 CLAUDE.md

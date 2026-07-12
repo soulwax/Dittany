@@ -1,12 +1,13 @@
 {
-    // Build config comes from the Eclipse .classpath (src + res as source folders, output to bin)
+    // Import Java sources, resources, and build configuration from Gradle.
     "java.configuration.updateBuildConfiguration": "automatic",
+    "java.autobuild.enabled": false,
     "java.debug.settings.onBuildFailureProceed": false,
     "files.exclude": {
-        "bin/": true
+        "build/": true
     },
     "search.exclude": {
-        "bin/": true
+        "build/": true
     },
     "chat.tools.terminal.autoApprove": {
         "d:\\Workspace\\Java\\Dittany\\gradlew.bat": true

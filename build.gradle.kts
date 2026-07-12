@@ -6,6 +6,14 @@ plugins {
 group = "de.cirrus"
 version = "1.0.0"
 
+val javaVersion = 26
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(javaVersion))
+    }
+}
+
 application {
     mainClass.set("de.cirrus.dittany.Dittany")
 }
@@ -14,17 +22,9 @@ repositories {
     mavenCentral()
 }
 
-// Eclipse-style layout: sources in src, sprites/levels in res
-sourceSets {
-    main {
-        java.setSrcDirs(listOf("src"))
-        resources.setSrcDirs(listOf("res"))
-    }
-}
-
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
-    options.release.set(17)
+    options.release.set(javaVersion)
 }
 
 tasks.withType<ProcessResources>().configureEach {
@@ -35,10 +35,6 @@ tasks.jar {
     manifest {
         attributes("Main-Class" to "de.cirrus.dittany.Dittany")
     }
-}
-
-tasks.named("build") {
-    dependsOn("packageExe")
 }
 
 tasks.register<Exec>("packageExe") {
@@ -61,7 +57,7 @@ tasks.register<Exec>("packageExe") {
         if (!jpackage.isFile) {
             throw GradleException(
                 "jpackage was not found in the JDK running Gradle (${jpackage.absolutePath}). " +
-                    "Run Gradle with a full JDK 17 or newer."
+                    "Run Gradle with a full JDK 26."
             )
         }
         outputDir.get().asFile.mkdirs()

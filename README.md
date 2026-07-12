@@ -1,25 +1,36 @@
 # Dittany
 
-Dittany is a 2D RTS/shooter prototype. The source lives under the `de.cirrus.dittany` package; the entry point is `de.cirrus.dittany.Dittany`.
+Dittany is a 2D RTS/shooter prototype written in Java using AWT/Swing. The entry point is `de.cirrus.dittany.Dittany`.
 
-It is plain Java (AWT/Swing) with no external dependencies and no build tool — the repository is an Eclipse-style project (`src` and `res` as source folders, output to `bin`) that also opens directly in VS Code or IntelliJ.
+The project uses the Gradle wrapper, so no system-wide Gradle installation is required. Application code and assets follow the standard Gradle directory layout:
+
+- `src/main/java` contains Java sources.
+- `src/main/resources` contains sprites and level data placed on the runtime classpath.
 
 ## Building and running
 
-In VS Code with the Extension Pack for Java installed, open the folder and press F5 (the "Launch Dittany" configuration).
+On Windows:
 
-From the command line:
-
-```powershell
-# PowerShell
-javac -d bin (Get-ChildItem -Recurse src -Filter *.java).FullName
-java -cp "bin;res" de.cirrus.dittany.Dittany
+```console
+.\gradlew.bat build
+.\gradlew.bat run
 ```
+
+On Linux or macOS:
 
 ```bash
-# bash
-javac -d bin $(find src -name '*.java')
-java -cp "bin:res" de.cirrus.dittany.Dittany
+./gradlew build
+./gradlew run
 ```
 
-`res` must be on the runtime classpath: sprites and the level map are loaded as classpath resources.
+## Windows package
+
+Create a self-contained Windows application image with:
+
+```console
+.\gradlew.bat --no-daemon packageExe
+```
+
+The result is written to `build/jpackage/Dittany`. Ship that entire directory. It includes `Dittany.exe`, the game, its resources, and a Java runtime, so players do not need to install Java separately.
+
+The project officially targets Java 26. Building and packaging require a full JDK 26 containing `jpackage`. Players do not need a JDK because the packaged application includes its own runtime. WiX is not required because the output is a portable application directory rather than an installer.

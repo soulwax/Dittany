@@ -110,7 +110,7 @@ public class PlayerView {
 			int yd = input.y - ySelectStart;
 			if (xd * xd + yd * yd < 9) {
 				Mob nearest = getNearest(input.x, input.y);
-				if (nearest != null) player.select(nearest);
+				player.select(nearest);
 			} else {
 				selectAll(xSelectStart, ySelectStart, input.x, input.y);
 			}
