@@ -7,5 +7,8 @@
     },
     "search.exclude": {
         "bin/": true
+    },
+    "chat.tools.terminal.autoApprove": {
+        "d:\\Workspace\\Java\\Dittany\\gradlew.bat": true
     }
 }

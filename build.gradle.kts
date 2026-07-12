@@ -1,0 +1,82 @@
+plugins {
+    java
+    application
+}
+
+group = "de.cirrus"
+version = "1.0.0"
+
+application {
+    mainClass.set("de.cirrus.dittany.Dittany")
+}
+
+repositories {
+    mavenCentral()
+}
+
+// Eclipse-style layout: sources in src, sprites/levels in res
+sourceSets {
+    main {
+        java.setSrcDirs(listOf("src"))
+        resources.setSrcDirs(listOf("res"))
+    }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+    options.release.set(17)
+}
+
+tasks.withType<ProcessResources>().configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.jar {
+    manifest {
+        attributes("Main-Class" to "de.cirrus.dittany.Dittany")
+    }
+}
+
+tasks.named("build") {
+    dependsOn("packageExe")
+}
+
+tasks.register<Exec>("packageExe") {
+    group = "distribution"
+    description = "Builds a self-contained Windows application with a Dittany.exe launcher"
+    dependsOn("installDist")
+
+    val installDir = layout.buildDirectory.dir("install/${project.name}")
+    val outputDir = layout.buildDirectory.dir("jpackage")
+    val appImageDir = outputDir.map { it.dir(project.name) }
+    val jpackage = File(
+        System.getProperty("java.home"),
+        if (System.getProperty("os.name").startsWith("Windows")) "bin/jpackage.exe" else "bin/jpackage"
+    )
+
+    inputs.dir(installDir)
+    outputs.dir(appImageDir)
+
+    doFirst {
+        if (!jpackage.isFile) {
+            throw GradleException(
+                "jpackage was not found in the JDK running Gradle (${jpackage.absolutePath}). " +
+                    "Run Gradle with a full JDK 17 or newer."
+            )
+        }
+        outputDir.get().asFile.mkdirs()
+        appImageDir.get().asFile.deleteRecursively()
+    }
+
+    executable(jpackage)
+    args(
+        "--type", "app-image",
+        "--name", project.name,
+        "--app-version", project.version.toString(),
+        "--input", installDir.map { it.dir("lib") }.get().asFile,
+        "--main-jar", "${project.name}-${project.version}.jar",
+        "--main-class", application.mainClass.get(),
+        "--dest", outputDir.get().asFile,
+        "--java-options", "-Dfile.encoding=UTF-8"
+    )
+}
