@@ -90,6 +90,7 @@ public class Level {
 
 		redPlayer = new Player(this, Team.red);
 		bluPlayer = new Player(this, Team.blu);
+		bluPlayer.ai = true;
 
 		SentryGun sg = new SentryGun(redPlayer);
 		sg.x = 32 * 16 + 8;
@@ -109,6 +110,8 @@ public class Level {
 	}
 
 	public void tick() {
+		if (bluPlayer.ai) bluPlayer.tick();
+
 		for (int i = 0; i < entities.size(); i++) {
 			Entity e = entities.get(i);
 			if (!e.removed) e.tick();

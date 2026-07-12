@@ -131,6 +131,7 @@ public class Mob extends Unit {
 	}
 
 	public Order getNextOrder() {
+		if (player.ai) return new HuntOrder();
 		return new IdleOrder();
 	}
 

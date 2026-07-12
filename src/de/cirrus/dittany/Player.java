@@ -7,6 +7,7 @@ import de.cirrus.dittany.unit.*;
 
 public class Player {
 	public List<Mob> selection = new ArrayList<Mob>();
+	public boolean ai;
 	public Team team;
 	public int[] visMap;
 	public Level level;
