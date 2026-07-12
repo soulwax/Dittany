@@ -69,6 +69,7 @@ The engine deliberately avoids external game frameworks. A small number of types
 | Player interaction | `PlayerView`, `Player` | Camera movement, selection, orders, minimap, class bar, and visibility state |
 | World | `Game`, `Level` | Owns the simulation, map, teams, entities, particles, collision index, fog, and render passes |
 | Rendering | `Bitmap`, `Sprite`, `Art` | Pixel framebuffer operations, isometric projection, sprite sorting, sprite-sheet loading, shadows, and fog blending |
+| GUI | `gui` package | Nested panels, images, buttons, and value bars rendered directly through `Bitmap` |
 | Actors | `Entity`, `Unit`, `Mob` | Movement, collision, health, teams, targeting, orders, animation, death, and respawning |
 | Behavior | `Order`, `MoveOrder`, `HuntOrder`, `IdleOrder` | Pluggable unit goals and path-following behavior |
 | Combat | `Weapon` and subclasses | Ammo, timing, range, aiming, reloading, and projectile creation |
@@ -158,6 +159,64 @@ drawHud(screen, player.getSelectedUnit());
 ```
 
 There is currently no bitmap-font renderer. To add labels, place a font sprite sheet in `src/main/resources`, load and cut it in `Art`, and map characters to glyph `Bitmap` objects before drawing them one by one.
+
+### Using the GUI package
+
+The `de.cirrus.dittany.gui` package supplies a deliberately small retained GUI model matching the rest of the engine:
+
+- `GuiComponent` holds position, size, visibility, enabled state, and parent-relative coordinates.
+- `GuiContainer` owns child components and forwards ticks and rendering.
+- `GuiPanel` is a colored, optionally bordered container.
+- `GuiImage` draws a `Bitmap`.
+- `GuiButton` exposes polled `hovered`, `down`, and `clicked` state.
+- `GuiProgressBar` draws a bounded value such as health or ammunition.
+
+State is public and behavior is polled, like `Input`, `Sprite`, and the other original engine classes. Gameplay code therefore remains in its owner instead of being hidden inside GUI callbacks.
+
+For example, a small selected-unit panel can be assembled once after `Art.init()`:
+
+```java
+private GuiPanel hud;
+private GuiProgressBar healthBar;
+private GuiButton unitButton;
+
+private void initGui() {
+    hud = new GuiPanel(8, 8, 112, 34);
+
+    healthBar = new GuiProgressBar(28, 10, 76, 6);
+    hud.add(healthBar);
+
+    unitButton = new GuiButton(4, 6, 20, 20, Art.i.red[0][0]);
+    hud.add(unitButton);
+}
+```
+
+Update it during the owning view's tick:
+
+```java
+hud.tick(input);
+
+Mob selected = player.getSelectedUnit();
+if (selected != null) {
+    healthBar.max = selected.maxHealth;
+    healthBar.value = selected.health;
+    unitButton.icon = Art.i.red[0][selected.unitClass];
+}
+
+if (unitButton.clicked) {
+    centerOn(selected);
+}
+```
+
+Render it after the world and reset the camera offsets first:
+
+```java
+screen.xOffs = 0;
+screen.yOffs = 0;
+hud.render(screen);
+```
+
+If a panel overlaps the playable world, check `hud.contains(input.x, input.y)` before processing world clicks so the same click does not also select a unit or issue an order.
 
 ### Example: a reusable button
 
@@ -289,6 +348,7 @@ The cleanest next architectural step is a `GameState` interface with `tick()` an
 src/main/java/de/cirrus/dittany/
 ├── ai/          pathfinding
 ├── entity/      projectiles, base entities, and pickups
+├── gui/         minimal Bitmap-based GUI components
 ├── level/       map, collision index, visibility, shadows, and minimap
 ├── particle/    combat and environmental effects
 ├── unit/        unit base classes and the nine playable classes
