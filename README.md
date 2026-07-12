@@ -57,9 +57,17 @@ Build a self-contained Windows application image with:
 .\gradlew.bat --no-daemon clean build packageExe
 ```
 
-The result is written to `dist/Dittany`. Distribute that entire directory, not only the executable. It contains `Dittany.exe`, the game JAR, resources, native support files, and a Java runtime, so players do not need Java installed. Distributions live outside Gradle's temporary `build` directory, allowing `gradlew clean` to work while a packaged copy of the game is running.
+The result is written to `dist/Dittany-<version>`. Distribute that entire directory, not only the executable. It contains `Dittany.exe`, the game JAR, resources, native support files, and a Java runtime, so players do not need Java installed. Distributions live outside Gradle's temporary `build` directory, allowing `gradlew clean` to work while a packaged copy of the game is running.
 
 Packaging requires a full JDK 26 containing `jpackage`. WiX is not required because this task creates a portable application directory rather than an installer.
+
+To also produce a shareable archive, add the `zip` property:
+
+```console
+.\gradlew.bat packageExe -Pzip
+```
+
+This additionally writes `dist/Dittany-<version>.zip` containing the complete application directory, ready to send to other players.
 
 ## How the game is structured
 
