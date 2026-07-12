@@ -5,8 +5,7 @@
             "type": "java",
             "name": "Launch Dittany",
             "request": "launch",
-            "mainClass": "de.cirrus.dittany.Dittany",
-            "projectName": "Dittany"
+            "mainClass": "de.cirrus.dittany.Dittany"
         }
     ]
 }
