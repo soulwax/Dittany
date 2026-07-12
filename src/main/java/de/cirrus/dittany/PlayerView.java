@@ -1,10 +1,13 @@
 package de.cirrus.dittany;
 
+import de.cirrus.dittany.gui.GuiLabel;
 import de.cirrus.dittany.level.Minimap;
 import de.cirrus.dittany.unit.*;
 import de.cirrus.dittany.unit.order.MoveOrder;
 
 public class PlayerView {
+	public static final String[] UNIT_NAMES = { "SCOUT", "SOLDIER", "PYRO", "DEMOMAN", "HEAVY", "ENGINEER", "MEDIC", "SNIPER", "SPY" };
+
 	public Game game;
 	public Player player;
 	public Input input;
@@ -26,12 +29,14 @@ public class PlayerView {
 	public int time = 0;
 
 	public Minimap minimap;
+	public GuiLabel selectionLabel;
 
 	public PlayerView(Game game, Player player, Input input) {
 		this.game = game;
 		this.player = player;
 		this.input = input;
 		minimap = new Minimap(game.level, player);
+		selectionLabel = new GuiLabel(2, 2, "", 0xffffffff);
 	}
 
 	public void sendAllSelectedTo(int x, int y) {
@@ -216,6 +221,8 @@ public class PlayerView {
 
 		screen.xOffs = 0;
 		screen.yOffs = 0;
+		updateSelectionLabel();
+		if (selectionLabel.visible) selectionLabel.render(screen);
 
 		if (selecting) drawSelectBox(screen, xSelectStart, ySelectStart, input.x, input.y);
 
@@ -228,5 +235,19 @@ public class PlayerView {
 				screen.blendDraw(Art.i.red[i][14], i * 20 + 64, 240 - 14, 0);
 			}
 		}
+	}
+
+	private void updateSelectionLabel() {
+		if (player.selection.isEmpty()) {
+			selectionLabel.visible = false;
+			return;
+		}
+		selectionLabel.visible = true;
+		if (player.selection.size() > 1) {
+			selectionLabel.setText(player.selection.size() + " UNITS");
+			return;
+		}
+		Mob unit = player.selection.get(0);
+		selectionLabel.setText(UNIT_NAMES[unit.unitClass] + " " + unit.health + "/" + unit.maxHealth);
 	}
 }

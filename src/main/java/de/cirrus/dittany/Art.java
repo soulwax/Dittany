@@ -19,6 +19,7 @@ public class Art {
 	public Bitmap[][] pickups = loadAndCut("/pickups.png", 8, 8);
 	public Bitmap[][] missiles = loadAndCut("/missiles.png", 8, 8);
 	public Bitmap[][] mapTiles = loadAndCut("/tiles.png", 24, 24);
+	public Bitmap[][] font = loadAndCut("/font.png", 32, 32);
 	public Bitmap panel = load("/panel.png");
 
 	public static Bitmap[][] loadAndCut(String name, int sw, int sh) {

@@ -4,7 +4,9 @@ import java.awt.*;
 import java.awt.image.*;
 
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 
+import de.cirrus.dittany.gui.GuiLabel;
 import de.cirrus.dittany.gui.SettingsMenu;
 import de.cirrus.dittany.level.EntityListCache;
 
@@ -13,7 +15,7 @@ public class Dittany extends Canvas implements Runnable {
 
 	public static final int WIDTH = 320;
 	public static final int HEIGHT = 240;
-	public static final int SCALE = 3;
+	public static final int DEFAULT_SCALE = 3;
 
 	private boolean keepRunning = true;
 	private BufferedImage screenImage;
@@ -25,10 +27,13 @@ public class Dittany extends Canvas implements Runnable {
 	private Game game;
 	private PlayerView playerView;
 	private SettingsMenu settingsMenu;
+	private GuiLabel fpsLabel;
 	private boolean paused;
+	private int scale = DEFAULT_SCALE;
+	private boolean showFps = true;
 
 	public Dittany() {
-		Dimension size = new Dimension(WIDTH * SCALE, HEIGHT * SCALE);
+		Dimension size = new Dimension(WIDTH * scale, HEIGHT * scale);
 
 		setPreferredSize(size);
 		setMaximumSize(size);
@@ -49,13 +54,14 @@ public class Dittany extends Canvas implements Runnable {
 		Art.init();
 		screenImage = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_ARGB);
 		screenBitmap = new Bitmap(screenImage);
-		mouse = inputHandler.updateMouseStatus(SCALE);
+		mouse = inputHandler.updateMouseStatus(scale);
 
 		setCursor(Toolkit.getDefaultToolkit().createCustomCursor(new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB), new Point(0, 0), "invisible"));
 
 		game = new Game();
 		playerView = new PlayerView(game, game.level.redPlayer, mouse);
-		settingsMenu = new SettingsMenu(WIDTH, HEIGHT);
+		settingsMenu = new SettingsMenu(WIDTH, HEIGHT, scale, showFps);
+		fpsLabel = new GuiLabel(0, 2, "0 FPS", 0xffffffff);
 		requestFocus();
 	}
 
@@ -83,7 +89,7 @@ public class Dittany extends Canvas implements Runnable {
 			boolean render = false;
 			while (unprocessedTime > 1) {
 				unprocessedTime -= 1;
-				mouse = inputHandler.updateMouseStatus(SCALE);
+				mouse = inputHandler.updateMouseStatus(scale);
 				EntityListCache.reset();
 				tick();
 				render = true;
@@ -96,7 +102,7 @@ public class Dittany extends Canvas implements Runnable {
 			}
 
 			if (System.currentTimeMillis() > lastFrameTime + 1000) {
-				System.out.println(frames + " fps");
+				fpsLabel.setText(frames + " FPS");
 				lastFrameTime += 1000;
 				frames = 0;
 			}
@@ -119,8 +125,8 @@ public class Dittany extends Canvas implements Runnable {
 		Graphics g = bs.getDrawGraphics();
 		int screenW = getWidth();
 		int screenH = getHeight();
-		int w = WIDTH * SCALE;
-		int h = HEIGHT * SCALE;
+		int w = WIDTH * scale;
+		int h = HEIGHT * scale;
 
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, screenW, screenH);
@@ -132,6 +138,10 @@ public class Dittany extends Canvas implements Runnable {
 
 	private void render(Bitmap screen) {
 		playerView.render(screen);
+		if (showFps) {
+			fpsLabel.x = screen.w - fpsLabel.w - 2;
+			fpsLabel.render(screen);
+		}
 		if (paused) settingsMenu.render(screen);
 		if (mouse.onScreen) screen.draw(Art.i.cursors[0][0], mouse.x - 1, mouse.y - 1);
 	}
@@ -140,12 +150,26 @@ public class Dittany extends Canvas implements Runnable {
 		if (mouse.escape.typed) paused = !paused;
 		if (paused) {
 			settingsMenu.tick(mouse);
+			if (settingsMenu.scale != scale) setScale(settingsMenu.scale);
+			showFps = settingsMenu.showFps;
 			if (settingsMenu.resume) paused = false;
 			if (settingsMenu.quit) stop();
 			return;
 		}
 		game.tick();
 		playerView.tick();
+	}
+
+	private void setScale(int scale) {
+		this.scale = scale;
+		SwingUtilities.invokeLater(() -> {
+			Dimension size = new Dimension(WIDTH * scale, HEIGHT * scale);
+			setPreferredSize(size);
+			setMaximumSize(size);
+			setMinimumSize(size);
+			Window window = SwingUtilities.getWindowAncestor(this);
+			if (window != null) window.pack();
+		});
 	}
 
 	public static void main(String[] args) {

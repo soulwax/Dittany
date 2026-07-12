@@ -27,6 +27,8 @@ This is a prototype rather than a complete commercial game. There are no menus, 
 
 Units engage enemies automatically when a target is within their weapon range.
 
+The ESC menu pauses the simulation and provides runtime controls for window scale (`1×`–`5×`) and the in-game FPS display, plus Resume and Quit actions. Gameplay uses the same bitmap font for selected-unit names, health values, group-selection counts, and FPS text.
+
 ## Building and running
 
 The repository is a Gradle project and includes the Gradle wrapper, so a separate Gradle installation is unnecessary. The project officially targets Java 26.
@@ -159,7 +161,7 @@ Use it from `PlayerView.render()` like this:
 drawHud(screen, player.getSelectedUnit());
 ```
 
-There is currently no bitmap-font renderer. To add labels, place a font sprite sheet in `src/main/resources`, load and cut it in `Art`, and map characters to glyph `Bitmap` objects before drawing them one by one.
+Text is rendered by `BitmapFont` from `src/main/resources/font.png`. The sheet contains 19 columns and 5 rows of 32×32 cells covering printable ASCII from space through `~`; the first cell is intentionally empty. The renderer downsamples the 2× glyph artwork to 16×16 and uses a compact 12-pixel character advance. `GuiLabel` wraps the rendered text in a regular `GuiImage`.
 
 ### Using the GUI package
 
@@ -169,7 +171,7 @@ The `de.cirrus.dittany.gui` package supplies a deliberately small retained GUI m
 - `GuiContainer` owns child components and forwards ticks and rendering.
 - `GuiPanel` is a colored, optionally bordered container.
 - `GuiImage` draws a `Bitmap`.
-- `GuiLabel` rasterizes short AWT text into a `Bitmap`.
+- `GuiLabel` renders text from the bundled bitmap-font sheet.
 - `GuiButton` exposes polled `hovered`, `down`, and `clicked` state.
 - `GuiProgressBar` draws a bounded value such as health or ammunition.
 - `SettingsMenu` composes these controls into the ESC pause menu.
@@ -337,7 +339,7 @@ The cleanest next architectural step is a `GameState` interface with `tick()` an
 
 - Add JUnit tests for coordinate transforms, selection, map decoding, damage, and order completion.
 - Replace fixed `64 × 64` assumptions with level dimensions.
-- Separate UI widgets from `PlayerView` and add a bitmap font.
+- Continue separating UI widgets from `PlayerView` as the HUD grows.
 - Add explicit match objectives, win/loss state, restart, and pause screens.
 - Move unit/class definitions into data files so new classes do not require edits across several switch-like sections.
 - Add formation movement and prevent selected units from converging on exactly one point.
