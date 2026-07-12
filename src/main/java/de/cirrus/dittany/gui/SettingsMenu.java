@@ -4,6 +4,9 @@ import de.cirrus.dittany.Bitmap;
 import de.cirrus.dittany.Input;
 
 public class SettingsMenu extends GuiPanel {
+	public static final int FONT_SIZE = BitmapFont.SMALL_GLYPH_SIZE;
+	public static final int FONT_ADVANCE = BitmapFont.SMALL_ADVANCE;
+
 	public GuiButton scaleDownButton;
 	public GuiButton scaleUpButton;
 	public GuiButton fpsButton;
@@ -34,13 +37,13 @@ public class SettingsMenu extends GuiPanel {
 		add(scaleUpButton);
 		addButtonLabel(scaleUpButton, "+");
 
-		scaleValue = new GuiLabel(0, 52, "", 0xffffffff);
+		scaleValue = new GuiLabel(0, 54, "", 0xffffffff, FONT_SIZE, FONT_ADVANCE);
 		add(scaleValue);
 
 		addCenteredLabel("SHOW FPS", 79);
 		fpsButton = new GuiButton(35, 96, 80, 20, null);
 		add(fpsButton);
-		fpsValue = new GuiLabel(0, 0, "", 0xffffffff);
+		fpsValue = new GuiLabel(0, 0, "", 0xffffffff, FONT_SIZE, FONT_ADVANCE);
 		add(fpsValue);
 
 		resumeButton = new GuiButton(35, 132, 80, 20, null);
@@ -55,13 +58,13 @@ public class SettingsMenu extends GuiPanel {
 	}
 
 	private void addCenteredLabel(String text, int y) {
-		GuiLabel label = new GuiLabel(0, y, text, 0xffffffff);
+		GuiLabel label = new GuiLabel(0, y, text, 0xffffffff, FONT_SIZE, FONT_ADVANCE);
 		label.x = (w - label.w) / 2;
 		add(label);
 	}
 
 	private void addButtonLabel(GuiButton button, String text) {
-		GuiLabel label = new GuiLabel(0, 0, text, 0xffffffff);
+		GuiLabel label = new GuiLabel(0, 0, text, 0xffffffff, FONT_SIZE, FONT_ADVANCE);
 		label.x = button.x + (button.w - label.w) / 2;
 		label.y = button.y + (button.h - label.h) / 2;
 		add(label);

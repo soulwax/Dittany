@@ -6,6 +6,7 @@ import java.awt.image.*;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import de.cirrus.dittany.gui.BitmapFont;
 import de.cirrus.dittany.gui.GuiLabel;
 import de.cirrus.dittany.gui.SettingsMenu;
 import de.cirrus.dittany.level.EntityListCache;
@@ -61,7 +62,7 @@ public class Dittany extends Canvas implements Runnable {
 		game = new Game();
 		playerView = new PlayerView(game, game.level.redPlayer, mouse);
 		settingsMenu = new SettingsMenu(WIDTH, HEIGHT, scale, showFps);
-		fpsLabel = new GuiLabel(0, 2, "0 FPS", 0xffffffff);
+		fpsLabel = new GuiLabel(0, 2, "0 FPS", 0xffffffff, BitmapFont.SMALL_GLYPH_SIZE, BitmapFont.SMALL_ADVANCE);
 		requestFocus();
 	}
 

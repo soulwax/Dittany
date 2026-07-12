@@ -161,7 +161,7 @@ Use it from `PlayerView.render()` like this:
 drawHud(screen, player.getSelectedUnit());
 ```
 
-Text is rendered by `BitmapFont` from `src/main/resources/font.png`. The sheet contains 19 columns and 5 rows of 32×32 cells covering printable ASCII from space through `~`; the first cell is intentionally empty. The renderer downsamples the 2× glyph artwork to 16×16 and uses a compact 12-pixel character advance. `GuiLabel` wraps the rendered text in a regular `GuiImage`.
+Text is rendered by `BitmapFont` from two sheets with the same printable-ASCII layout. `font.png` supplies the large 16-pixel HUD glyphs, while `font8x8.png` supplies native 8-pixel settings and FPS glyphs without lossy resizing. Both sheets contain 19 columns and 5 rows covering space through `~`; the first cell is intentionally empty. `GuiLabel` wraps rendered text in a regular `GuiImage`.
 
 ### Using the GUI package
 
